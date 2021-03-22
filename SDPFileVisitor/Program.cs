@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
 using SDPFileVisitor.Core.Interfaces;
 using SDPFileVisitor.Core.Services;
 
@@ -14,7 +13,7 @@ namespace SDPFileVisitor
         {
             var startPath = "G:\\temporary location";
 
-            var visitor = new FileSystemVisitorService(startPath, x => x.Name.Contains("Output") || x.Name.Contains("Source") || x.Name.Contains("exclude"));
+            var visitor = new FileSystemVisitorService(startPath, x => x.Name.Contains("exclude") || x.Name.Contains("Output"));
             SubscribeHandlers(visitor);
 
             try
