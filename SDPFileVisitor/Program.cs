@@ -13,12 +13,8 @@ namespace SDPFileVisitor
         static void Main(string[] args)
         {
             var startPath = "G:\\temporary location";
-            var serviceProvider = new ServiceCollection()
-                .AddSingleton<IFileSystemVisitorService, FileSystemVisitorService>((service) =>
-                    new FileSystemVisitorService(startPath, x => x.Name.Contains("New")))
-                .BuildServiceProvider();
 
-            var visitor = new FileSystemVisitorService(startPath, x => x.Name.Contains("1"));
+            var visitor = new FileSystemVisitorService(startPath, x => x.Name.Contains("Output") || x.Name.Contains("Source") || x.Name.Contains("exclude"));
             SubscribeHandlers(visitor);
 
             try

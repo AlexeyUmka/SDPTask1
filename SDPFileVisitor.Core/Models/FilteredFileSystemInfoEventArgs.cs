@@ -3,6 +3,6 @@
     public class FilteredFileSystemInfoEventArgs
     {
         public string Name { get; set; }
-        public bool Exclude { get; set; } = false;
+        public bool Exclude { get; set; }
     }
 }
