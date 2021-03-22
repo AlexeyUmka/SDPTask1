@@ -5,17 +5,17 @@ using SDPFileVisitor.Core.Models;
 
 namespace SDPFileVisitor.Core.Interfaces
 {
-    public delegate void FileSystemHandler(object sender, FileSystemVisitorEventArgs e);
+    public delegate void FileSystemHandler<TEventArgs>(object sender, TEventArgs e);
     public interface IFileSystemVisitorService
     {
-        event FileSystemHandler SearchStarted;
-        event FileSystemHandler SearchFinished;
+        event FileSystemHandler<StartFinishEventArgs> SearchStarted;
+        event FileSystemHandler<StartFinishEventArgs> SearchFinished;
 
-        event FileSystemHandler DirectoryFound;
-        event FileSystemHandler FileFound;
+        event FileSystemHandler<FileSystemInfoEventArgs> DirectoryFound;
+        event FileSystemHandler<FileSystemInfoEventArgs> FileFound;
 
-        event FileSystemHandler DirectoryFiltered;
-        event FileSystemHandler FileFiltered;
+        event FileSystemHandler<FilteredFileSystemInfoEventArgs> DirectoryFiltered;
+        event FileSystemHandler<FilteredFileSystemInfoEventArgs> FileFiltered;
 
         IEnumerable<FileSystemInfo> Search();
     }

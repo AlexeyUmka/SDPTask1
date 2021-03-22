@@ -18,7 +18,7 @@ namespace SDPFileVisitor
                     new FileSystemVisitorService(startPath, x => x.Name.Contains("New")))
                 .BuildServiceProvider();
 
-            var visitor = serviceProvider.GetService<IFileSystemVisitorService>();
+            var visitor = new FileSystemVisitorService(startPath, x => x.Name.Contains("1"));
             SubscribeHandlers(visitor);
 
             try
