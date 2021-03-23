@@ -12,14 +12,14 @@ namespace SDPFileVisitor.Core.Services
         private readonly string _startPath;
         private readonly Predicate<FileSystemInfo> _matchPredicate;
 
-        public event FileSystemHandler<StartFinishEventArgs> SearchFinished;
-        public event FileSystemHandler<StartFinishEventArgs> SearchStarted;
+        public event EventHandler<StartFinishEventArgs> SearchFinished;
+        public event EventHandler<StartFinishEventArgs> SearchStarted;
 
-        public event FileSystemHandler<FileSystemInfoEventArgs> DirectoryFound;
-        public event FileSystemHandler<FileSystemInfoEventArgs> FileFound;
+        public event EventHandler<FileSystemInfoEventArgs> DirectoryFound;
+        public event EventHandler<FileSystemInfoEventArgs> FileFound;
 
-        public event FileSystemHandler<FilteredFileSystemInfoEventArgs> DirectoryFiltered;
-        public event FileSystemHandler<FilteredFileSystemInfoEventArgs> FileFiltered;
+        public event EventHandler<FilteredFileSystemInfoEventArgs> DirectoryFiltered;
+        public event EventHandler<FilteredFileSystemInfoEventArgs> FileFiltered;
 
         public FileSystemVisitorService(string startPath)
         {
@@ -54,8 +54,8 @@ namespace SDPFileVisitor.Core.Services
             var allElements = directoryInfo.GetFileSystemInfos();
             foreach (var fileSystemInfo in allElements)
             {
-                var itemFoundEventArgs = new FileSystemInfoEventArgs() { Name = fileSystemInfo.FullName};
-                var itemFilteredEventArgs = new FilteredFileSystemInfoEventArgs() { Name = fileSystemInfo.FullName};
+                var itemFoundEventArgs = new FileSystemInfoEventArgs(fileSystemInfo.FullName);
+                var itemFilteredEventArgs = new FilteredFileSystemInfoEventArgs(fileSystemInfo.FullName);
                 if (fileSystemInfo is FileInfo)
                 {
                     FileFound?.Invoke(this, itemFoundEventArgs);
