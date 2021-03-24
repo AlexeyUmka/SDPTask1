@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
 using SDPFileVisitor.Core.Interfaces;
 using SDPFileVisitor.Core.Services;
 
@@ -13,12 +12,8 @@ namespace SDPFileVisitor
         static void Main(string[] args)
         {
             var startPath = "G:\\temporary location";
-            var serviceProvider = new ServiceCollection()
-                .AddSingleton<IFileSystemVisitorService, FileSystemVisitorService>((service) =>
-                    new FileSystemVisitorService(startPath, x => x.Name.Contains("New")))
-                .BuildServiceProvider();
 
-            var visitor = serviceProvider.GetService<IFileSystemVisitorService>();
+            var visitor = new FileSystemVisitorService(startPath, x => x.Name.Contains("exclude") || x.Name.Contains("Output"));
             SubscribeHandlers(visitor);
 
             try
