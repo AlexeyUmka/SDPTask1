@@ -11,51 +11,73 @@ namespace Tests
 {
     public class UnitTest1
     {
-        private Mock<IDirectoryInfoService> _directoryInfoMock;
         private const string RootPath = "root";
         private const string DefaultFileName = "file";
         private const string DefaultFileExtension = "exe";
         private const string DefaultDirectoryName = "child";
+        private const int FirstLevelFilesAmount = 20;
+        private const int FirstLevelDirectoriesAmount = 1;
+        private const int SecondLevelFilesAmount = 10;
+        private const int SecondLevelDirectoriesAmount = 1;
+        private static string FirstPath => getDirectoryPath(0);
+        private static string SecondPath => getDirectoryPath(1);
+        private static string ThirdPath => getDirectoryPath(2);
+        private static List<FileSystemInfoModel> FirstLevelFiles => GetDefaultFiles(FirstPath, FirstLevelFilesAmount).ToList();
+        private static List<FileSystemInfoModel> FirstLevelDirectories => GetDefaultDirectories(SecondPath).ToList();
+        private static List<FileSystemInfoModel> SecondLevelFiles => GetDefaultFiles(ThirdPath, SecondLevelFilesAmount).ToList();
+        private static List<FileSystemInfoModel> SecondLevelDirectories => GetDefaultDirectories(ThirdPath).ToList();
+
+        private static int AllElementsAmount => GetSum(FirstLevelFilesAmount, FirstLevelDirectoriesAmount,
+            SecondLevelFilesAmount, SecondLevelDirectoriesAmount);
 
         [Fact]
         public void GetFileSystemInfo_WithoutFilteringFlags_ShouldReturnProperAmountOfTheElements()
         {
             // Arrange
-            const int firstLevelFilesAmount = 20;
-            const int firstLevelDirectoriesAmount = 1;
-            const int secondLevelFilesAmount = 10;
-            const int secondLevelDirectoriesAmount = 1;
-
-            var firstPath = getDirectoryPath(0);
-            var secondPath = getDirectoryPath(1);
-            var thirdPath = getDirectoryPath(2);
-
-            var firstLevelFiles = GetDefaultFiles(firstPath, firstLevelFilesAmount).ToList();
-            var firstLevelDirectories = GetDefaultDirectories(firstPath).ToList();
-            var secondLevelFiles = GetDefaultFiles(secondPath, secondLevelFilesAmount).ToList();
-            var secondLevelDirectories = GetDefaultDirectories(secondPath).ToList();
-            var allElementsAmount = GetSum(firstLevelFilesAmount, firstLevelDirectoriesAmount, secondLevelFilesAmount,
-                secondLevelDirectoriesAmount);
-            _directoryInfoMock = new Mock<IDirectoryInfoService>();
-            _directoryInfoMock
-                .Setup(x => x.GetFileSystemInfos(firstPath))
-                .Returns(firstLevelFiles.Concat(firstLevelDirectories).ToList());
-            _directoryInfoMock
-                .Setup(x => x.GetFileSystemInfos(secondPath))
-                .Returns(secondLevelFiles.Concat(secondLevelDirectories).ToList());
+            var directoryInfoMock = new Mock<IDirectoryInfoService>();
+            SetDefaultMockSetup(directoryInfoMock);
+            
             // Act
-            var visitor = new FileSystemVisitorService(RootPath, _directoryInfoMock.Object);
+            var visitor = new FileSystemVisitorService(FirstPath, directoryInfoMock.Object);
             var searchResult = visitor.Search().ToList();
             // Assert
-            Assert.Equal(firstLevelFilesAmount, firstLevelFiles.Count());
-            Assert.Equal(firstLevelDirectoriesAmount, firstLevelDirectories.Count());
-            Assert.Equal(secondLevelFilesAmount, secondLevelFiles.Count());
-            Assert.Equal(secondLevelDirectoriesAmount, secondLevelDirectories.Count());
-            Assert.Equal(allElementsAmount, searchResult.Count());
+            Assert.Equal(FirstLevelFilesAmount, FirstLevelFiles.Count());
+            Assert.Equal(FirstLevelDirectoriesAmount, FirstLevelDirectories.Count());
+            Assert.Equal(SecondLevelFilesAmount, SecondLevelFiles.Count());
+            Assert.Equal(SecondLevelDirectoriesAmount, SecondLevelDirectories.Count());
+            Assert.Equal(AllElementsAmount, searchResult.Count());
+        }
+        
+        [Fact]
+        public void GetFileSystemInfo_WithoutFilteringFlags_ShouldCallAppropriateEvents()
+        {
+            // // Arrange
+            // var directoryInfoMock = new Mock<IDirectoryInfoService>();
+            // SetDefaultMockSetup(directoryInfoMock);
+            //
+            // // Act
+            // var visitor = new FileSystemVisitorService(FirstPath, directoryInfoMock.Object);
+            // var searchResult = visitor.Search().ToList();
+            // // Assert
+            // Assert.Equal(FirstLevelFilesAmount, FirstLevelFiles.Count());
+            // Assert.Equal(FirstLevelDirectoriesAmount, FirstLevelDirectories.Count());
+            // Assert.Equal(SecondLevelFilesAmount, SecondLevelFiles.Count());
+            // Assert.Equal(SecondLevelDirectoriesAmount, SecondLevelDirectories.Count());
+            // Assert.Equal(AllElementsAmount, searchResult.Count());
+        }
+
+        private static void SetDefaultMockSetup(Mock<IDirectoryInfoService> directoryServiceMock)
+        {
+            directoryServiceMock
+                .Setup(x => x.GetFileSystemInfos(FirstPath))
+                .Returns(FirstLevelFiles.Concat(FirstLevelDirectories).ToList());
+            directoryServiceMock
+                .Setup(x => x.GetFileSystemInfos(SecondPath))
+                .Returns(SecondLevelFiles.Concat(SecondLevelDirectories).ToList());
         }
 
 
-        private IEnumerable<FileSystemInfoModel> GetDefaultFiles(string path, int amount = 1)
+        private static IEnumerable<FileSystemInfoModel> GetDefaultFiles(string path, int amount = 1)
         {
             var fileSystemInfoModels = Enumerable.Repeat(
                 new FileSystemInfoModel(DefaultFileName, path, DefaultFileExtension,
@@ -63,7 +85,7 @@ namespace Tests
             return fileSystemInfoModels;
         }
 
-        private IEnumerable<FileSystemInfoModel> GetDefaultDirectories(string path, int amount = 1)
+        private static IEnumerable<FileSystemInfoModel> GetDefaultDirectories(string path, int amount = 1)
         {
             var fileSystemInfoModels = Enumerable.Repeat(
                 new FileSystemInfoModel(DefaultDirectoryName, path, "",
@@ -71,13 +93,13 @@ namespace Tests
             return fileSystemInfoModels;
         }
 
-        private string getDirectoryPath(int nestingLevel = 0)
+        private static string getDirectoryPath(int nestingLevel = 0)
         {
-            var path = $"{RootPath}{Enumerable.Repeat($"/{DefaultDirectoryName}", nestingLevel)}";
+            var path = $"{RootPath}{string.Join(string.Empty, Enumerable.Repeat($"/{DefaultDirectoryName}", nestingLevel))}";
             return path;
         }
 
-        private int GetSum(params int[] numbers)
+        private static int GetSum(params int[] numbers)
         {
             return numbers.Sum();
         }
