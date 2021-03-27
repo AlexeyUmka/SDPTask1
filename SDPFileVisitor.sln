@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDPFileVisitor", "SDPFileVi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDPFileVisitor.Core", "SDPFileVisitor.Core\SDPFileVisitor.Core.csproj", "{1C4D156B-59D6-48FF-B9AC-763EA2897861}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{1FC696DC-EDBB-4299-816E-8B75E0F9DA10}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDPFileVisitor.Core.Tests", "SDPFileVisitor.Core.Tests\SDPFileVisitor.Core.Tests.csproj", "{1FC696DC-EDBB-4299-816E-8B75E0F9DA10}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
