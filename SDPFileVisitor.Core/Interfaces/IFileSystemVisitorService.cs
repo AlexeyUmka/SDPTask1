@@ -16,6 +16,6 @@ namespace SDPFileVisitor.Core.Interfaces
         event EventHandler<FilteredFileSystemInfoEventArgs> DirectoryFiltered;
         event EventHandler<FilteredFileSystemInfoEventArgs> FileFiltered;
 
-        IEnumerable<FileSystemInfo> Search();
+        IEnumerable<FileSystemInfoModel> Search();
     }
 }

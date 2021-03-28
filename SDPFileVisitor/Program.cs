@@ -13,7 +13,7 @@ namespace SDPFileVisitor
         {
             var startPath = "G:\\temporary location";
 
-            var visitor = new FileSystemVisitorService(startPath, x => x.Name.Contains("exclude") || x.Name.Contains("Output"));
+            var visitor = new FileSystemVisitorService(startPath, new DirectoryInfoService()); //new FileSystemVisitorService(startPath, x => x.Name.Contains("exclude") || x.Name.Contains("Output"), new DirectoryInfoService());
             SubscribeHandlers(visitor);
 
             try

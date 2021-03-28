@@ -10,7 +10,8 @@ namespace SDPFileVisitor.Core.Services
     public class FileSystemVisitorService : IFileSystemVisitorService
     {
         private readonly string _startPath;
-        private readonly Predicate<FileSystemInfo> _matchPredicate;
+        private readonly Predicate<FileSystemInfoModel> _matchPredicate;
+        private readonly IDirectoryInfoService _directoryInfoService;
 
         public event EventHandler<StartFinishEventArgs> SearchFinished;
         public event EventHandler<StartFinishEventArgs> SearchStarted;
@@ -21,42 +22,45 @@ namespace SDPFileVisitor.Core.Services
         public event EventHandler<FilteredFileSystemInfoEventArgs> DirectoryFiltered;
         public event EventHandler<FilteredFileSystemInfoEventArgs> FileFiltered;
 
-        public FileSystemVisitorService(string startPath)
+        public FileSystemVisitorService(string startPath, IDirectoryInfoService directoryInfoService)
         {
             _startPath = startPath;
             _matchPredicate = (x) => true;
+            _directoryInfoService = directoryInfoService;
         }
 
         public FileSystemVisitorService(
             string startPath,
-            Predicate<FileSystemInfo> matchPredicate)
+            Predicate<FileSystemInfoModel> matchPredicate,
+            IDirectoryInfoService directoryInfoService)
         {
             _startPath = startPath;
             _matchPredicate = matchPredicate;
+            _directoryInfoService = directoryInfoService;
         }
 
-        public IEnumerable<FileSystemInfo> Search()
+        public IEnumerable<FileSystemInfoModel> Search()
         {
             var startFinishEventArgs = new StartFinishEventArgs();
             SearchStarted?.Invoke(this, startFinishEventArgs);
             if (startFinishEventArgs.StopSearch)
             {
                 SearchFinished?.Invoke(this, startFinishEventArgs);
-                return new List<FileSystemInfo>();
+                return new List<FileSystemInfoModel>();
             }
-            var result = GetFileSystemInfo(new DirectoryInfo(_startPath)).ToList();
+            var result = GetFileSystemInfo(_startPath).ToList();
             SearchFinished?.Invoke(this, startFinishEventArgs);
             return result;
         }
 
-        IEnumerable<FileSystemInfo> GetFileSystemInfo(DirectoryInfo directoryInfo)
+        IEnumerable<FileSystemInfoModel> GetFileSystemInfo(string directoryInfo)
         {
-            var allElements = directoryInfo.GetFileSystemInfos();
+            var allElements = _directoryInfoService.GetFileSystemInfos(directoryInfo);
             foreach (var fileSystemInfo in allElements)
             {
                 var itemFoundEventArgs = new FileSystemInfoEventArgs(fileSystemInfo.FullName);
                 var itemFilteredEventArgs = new FilteredFileSystemInfoEventArgs(fileSystemInfo.FullName);
-                if (fileSystemInfo is FileInfo)
+                if (fileSystemInfo.SystemItemType == SystemItemType.File)
                 {
                     FileFound?.Invoke(this, itemFoundEventArgs);
                     if (itemFoundEventArgs.StopSearch)
@@ -76,7 +80,7 @@ namespace SDPFileVisitor.Core.Services
                         }
                     }
                 }
-                else if (fileSystemInfo is DirectoryInfo nextDirectory)
+                else if (fileSystemInfo.SystemItemType == SystemItemType.Directory)
                 {
                     DirectoryFound?.Invoke(this, itemFoundEventArgs);
                     if (itemFoundEventArgs.StopSearch)
@@ -85,7 +89,7 @@ namespace SDPFileVisitor.Core.Services
                     }
                     if (_matchPredicate(fileSystemInfo) && !itemFoundEventArgs.Exclude)
                     {
-                        foreach (var nextFileSystemInfo in GetFileSystemInfo(nextDirectory))
+                        foreach (var nextFileSystemInfo in GetFileSystemInfo(fileSystemInfo.FullName))
                         {
                             yield return nextFileSystemInfo;
                         }
