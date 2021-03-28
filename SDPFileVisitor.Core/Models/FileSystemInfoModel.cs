@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using SDPFileVisitor.Core.Comparers;
 
 namespace SDPFileVisitor.Core.Models
 {
@@ -14,6 +15,18 @@ namespace SDPFileVisitor.Core.Models
             FullName = fullName;
             Extension = extension;
             SystemItemType = systemItemType;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            var comparer = new FileSystemInfoModelComparer();
+            return comparer.Equals(this, obj as FileSystemInfoModel);
+        }
+
+        public override int GetHashCode()
+        {
+            var comparer = new FileSystemInfoModelComparer();
+            return comparer.GetHashCode(this);
         }
     }
 }
